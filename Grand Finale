@@ -1,0 +1,208 @@
+import math
+from random import choice
+
+import pygame
+from random import randint
+
+FPS = 30
+
+RED = 0xFF0000
+BLUE = 0x0000FF
+YELLOW = 0xFFC91F
+GREEN = 0x00FF00
+MAGENTA = 0xFF03B8
+CYAN = 0x00FFCC
+BLACK = (0, 0, 0)
+WHITE = 0xFFFFFF
+GREY = 0x7D7D7D
+GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+
+WIDTH = 1430
+HEIGHT = 800
+
+'''
+self.r = 20 + 5 * self.level
+'''
+
+
+
+class Hero:
+    def __init__(self, screen):
+        self.screen = screen
+        self.color = GREEN
+        self.x = 80
+        self.y = 400
+        self.vx = 20
+        self.vy = 20
+        self.level = 1
+    def drive(self, direction):
+        if direction == 'left' and self.x > 20:
+            self.x-=self.vx
+        elif direction == 'right' and self.x < 1400:
+            self.x+=self.vx
+        elif direction == 'up' and self.y < 760:
+            self.y+=self.vy
+        elif direction == 'down' and self. y > 20:
+            self.y-=self.vy
+        
+    def draw(self):
+        pygame.draw.circle(self.screen, self.color, [self.x, self.y], 30 , width = 0)
+    def hittest(self, obj):
+        if (obj.x - self.x) ** 2 + (obj.y - self.y) ** 2 < 50 ** 2:
+            return True
+        else:
+            return False
+
+
+class Target:
+    def __init__(self, y, screen: pygame.Surface):
+        self.screen = screen
+        self.x = 1470
+        self.live = 1
+        self.vx = randint(1, 5)
+        self.level = randint(1, 7)
+        self.r = 30
+        self.new_target()
+        self.y = y
+
+    def new_target(self):
+        self.x = 1470
+        self.r = 30
+        self.color = RED
+        self.vx = randint(1, 5)
+        self.level = randint(1, 7)
+    
+    def move(self):
+        self.x -= self.vx
+
+    def draw(self):
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
+        
+class Button_end:
+    def __init__(self, screen):
+
+        self.an = 1
+        self.x = 80
+        self.y = 400
+        self.vx = 20
+        self.vy = 20
+        self.level = 1
+
+
+
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Игра "Рыбка"')
+font = pygame.font.Font('Raindrop.otf', 36)
+clock = pygame.time.Clock()
+bg = pygame.image.load('/Users/nikitazaleskij/Downloads/Фон рыбка.jpg')
+bg = pygame.transform.scale(bg, (1430, 800))
+hero = Hero(screen)
+target_1 = Target(randint(30, 130), screen)
+target_2 = Target(randint(190, 290), screen)
+target_3 = Target(randint(350, 450), screen)
+target_4 = Target(randint(510, 610), screen)
+target_5 = Target(randint(670, 770), screen)
+finished = False
+end = False
+f1 = pygame.font.Font(None, 36)
+while not end:
+    screen.blit(bg, (0, 0))
+    
+    while not finished:
+        screen.blit(bg, (0, 0))
+        hero.draw()
+        target_1.draw()
+        target_2.draw()
+        target_3.draw()
+        target_4.draw()
+        target_5.draw()
+        text1 = f1.render(f'{hero.level}', True , (180, 0, 0), GREY)
+        text2 = f1.render(f'{target_1.level}', True , (180, 0, 0), GREY)
+        text3 = f1.render(f'{target_2.level}', True , (180, 0, 0), GREY)
+        text4 = f1.render(f'{target_3.level}', True , (180, 0, 0), GREY)
+        text5 = f1.render(f'{target_4.level}', True , (180, 0, 0), GREY)
+        text6 = f1.render(f'{target_5.level}', True , (180, 0, 0), GREY)
+        screen.blit(text1, (hero.x - 8, hero.y - 8))
+        screen.blit(text2, (target_1.x - 8, target_1.y - 8))
+        screen.blit(text3, (target_2.x - 8, target_2.y - 8))
+        screen.blit(text4, (target_3.x - 8, target_3.y - 8))
+        screen.blit(text5, (target_4.x - 8, target_4.y - 8))
+        screen.blit(text6, (target_5.x - 8, target_5.y - 8))
+        pygame.display.update()
+        keys = pygame.key.get_pressed()
+        if not False in keys: print(keys)
+        if keys[1073741906]: 
+            hero.drive('down')
+        elif keys[1073741905]: 
+            hero.drive('up')
+        elif keys[1073741903]: 
+            hero.drive('right')
+        elif keys[1073741904]: 
+            hero.drive('left')
+    
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+                end = True
+            
+        if hero.hittest(target_1) and target_1.live:
+            if target_1.level <= hero.level:
+                target_1.new_target()
+                hero.level += 1
+            else:
+                finished = True
+        if hero.hittest(target_2) and target_2.live:
+            if target_2.level <= hero.level:
+                target_2.new_target()
+                hero.level += 1 
+            else:
+                finished = True
+        if hero.hittest(target_3) and target_3.live:
+            if target_3.level <= hero.level:
+                target_3.new_target()
+                hero.level += 1
+            else:
+                finished = True
+        if hero.hittest(target_4) and target_4.live:
+            if target_4.level <= hero.level:
+                target_4.new_target()
+                hero.level += 1 
+            else:
+                finished = True
+        if hero.hittest(target_5) and target_5.live:
+            if target_5.level <= hero.level:
+                target_5.new_target()
+                hero.level += 1
+            else:
+                finished = True
+        target_1.move()
+        target_2.move()
+        target_3.move()
+        target_4.move()
+        target_5.move()
+        if target_1.x < -40:
+            target_1.new_target()
+        if target_2.x < -40:
+            target_2.new_target()
+        if target_3.x < -40:
+            target_3.new_target()
+        if target_4.x < -40:
+            target_4.new_target()
+        if target_5.x < -40:
+            target_5.new_target()
+    screen.blit(bg, (0, 0))
+    text_end = f1.render("Игра окончена. Нажмите (R), чтобы выйти", True , (180, 0, 0), YELLOW)
+    '''
+    pygame.draw.rect(screen, YELLOW, (715, 400, 200, 100))
+    '''
+    screen.blit(text_end, (715, 400))
+    kostil = False
+    while not kostil:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                end = True
+                kostil = True
+    
+pygame.quit()
